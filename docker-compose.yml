@@ -3,6 +3,8 @@ version: '3.2'
 services:
   droplet:
     build: ./
+    environment:
+      - MONGO_URI=mongodb://mongo
     ports:
       - "8080:8080"
     links:

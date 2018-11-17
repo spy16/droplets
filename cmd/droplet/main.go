@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/spf13/viper"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/spy16/droplet/internal/delivery/rest"
 	"github.com/spy16/droplet/internal/stores"
@@ -13,9 +14,11 @@ import (
 )
 
 func main() {
+	viper.AutomaticEnv()
+	viper.SetDefault("MONGO_URI", "mongodb://localhost")
 	lg := logger.New(os.Stderr, "debug", "text")
 
-	client, err := mongo.NewClient("mongodb://localhost")
+	client, err := mongo.NewClient(viper.GetString("MONGO_URI"))
 	if err != nil {
 		lg.Errorf("failed to setup MongoDB client: %s", err)
 		os.Exit(1)
