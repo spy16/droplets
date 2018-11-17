@@ -8,6 +8,9 @@ import (
 // Error is a generic error representation with some fields to provide additional
 // context around the error.
 type Error struct {
+	// Code can represent an http error code.
+	Code int
+
 	// Type should be an error code to identify the error. Type and Context together
 	// should provide enough context for robust error handling on client side.
 	Type string `json:"type,omitempty"`

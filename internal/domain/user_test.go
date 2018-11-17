@@ -8,21 +8,21 @@ import (
 	"github.com/spy16/droplet/pkg/errors"
 )
 
-func TestAuthor_Validate(suite *testing.T) {
+func TestUser_Validate(suite *testing.T) {
 	suite.Parallel()
 
 	cases := []struct {
-		author    domain.Author
+		user      domain.User
 		expectErr bool
 		errType   string
 	}{
 		{
-			author:    domain.Author{},
+			user:      domain.User{},
 			expectErr: true,
 			errType:   errors.TypeMissingField,
 		},
 		{
-			author: domain.Author{
+			user: domain.User{
 				Meta: domain.Meta{
 					Kind: "Author",
 					Name: "spy16",
@@ -33,7 +33,7 @@ func TestAuthor_Validate(suite *testing.T) {
 			errType:   errors.TypeInvalidValue,
 		},
 		{
-			author: domain.Author{
+			user: domain.User{
 				Meta: domain.Meta{
 					Kind: "Author",
 					Name: "spy16",
@@ -46,7 +46,7 @@ func TestAuthor_Validate(suite *testing.T) {
 
 	for id, cs := range cases {
 		suite.Run(fmt.Sprintf("Case#%d", id), func(t *testing.T) {
-			testValidation(t, cs.author, cs.expectErr, cs.errType)
+			testValidation(t, cs.user, cs.expectErr, cs.errType)
 		})
 	}
 }

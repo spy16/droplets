@@ -10,7 +10,7 @@ import (
 )
 
 // New initializes the server with routes exposing the given usecases.
-func New(logger logger.Logger) *Server {
+func New(logger logger.Logger, reg registration) *Server {
 	srv := &Server{}
 	srv.Logger = logger
 
@@ -21,6 +21,7 @@ func New(logger logger.Logger) *Server {
 
 	// setup api endpoints
 	router.HandleFunc("/health", srv.healthCheckHandler)
+	addUsersAPI(logger, router, reg)
 
 	// setup middlewares
 	srv.router = middlewares.WithRequestLogging(logger, router)
@@ -43,13 +44,13 @@ func (srv *Server) healthCheckHandler(wr http.ResponseWriter, req *http.Request)
 	info := map[string]interface{}{
 		"status": "ok",
 	}
-	writeJSON(wr, http.StatusOK, info, srv.Logger)
+	writeResponse(wr, http.StatusOK, info)
 }
 
 func (srv *Server) notFoundHandler(wr http.ResponseWriter, req *http.Request) {
-	writeJSON(wr, http.StatusNotFound, errors.ResourceNotFound("path", req.URL.Path), srv.Logger)
+	writeResponse(wr, http.StatusNotFound, errors.ResourceNotFound("path", req.URL.Path))
 }
 
 func (srv *Server) methodNotAllowedHandler(wr http.ResponseWriter, req *http.Request) {
-	writeJSON(wr, http.StatusMethodNotAllowed, errors.ResourceNotFound("path", req.URL.Path), srv.Logger)
+	writeResponse(wr, http.StatusMethodNotAllowed, errors.ResourceNotFound("path", req.URL.Path))
 }

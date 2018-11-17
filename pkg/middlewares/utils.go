@@ -1,6 +1,10 @@
 package middlewares
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/spy16/droplet/pkg/logger"
+)
 
 func requestInfo(req *http.Request) map[string]interface{} {
 	return map[string]interface{}{
@@ -13,6 +17,7 @@ func requestInfo(req *http.Request) map[string]interface{} {
 
 type wrappedWriter struct {
 	http.ResponseWriter
+	logger.Logger
 
 	wroteStatus int
 }

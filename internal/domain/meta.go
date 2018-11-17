@@ -10,25 +10,24 @@ import (
 // Meta represents metadata about different entities.
 type Meta struct {
 	// Kind represents the type of the object.
-	Kind string `json:"kind"`
+	Kind string `json:"kind" bson:"kind"`
 
 	// Name represents a unique name/identifier for the object.
-	Name string `json:"name"`
+	Name string `json:"name" bson:"name"`
 
-	// Labels can contain additional metadata about the object.
-	Labels map[string]string `json:"labels,omitempty"`
+	// Tags can contain additional metadata about the object.
+	Tags []string `json:"tags,omitempty" bson:"tags"`
 
 	// CreateAt represents the time at which this object was created.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty" bson:"created_at"`
 
 	// UpdatedAt represents the time at which this object was last
 	// modified.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty" bson:"updated_at"`
 }
 
 // SetDefaults sets sensible defaults on meta.
 func (meta *Meta) SetDefaults() {
-	meta.Labels = map[string]string{}
 	if meta.CreatedAt.IsZero() {
 		meta.CreatedAt = time.Now()
 		meta.UpdatedAt = time.Now()

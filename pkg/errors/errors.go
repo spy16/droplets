@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"net/http"
 )
 
 // TypeUnknown represents unknown error type.
@@ -11,6 +12,7 @@ const TypeUnknown = "Unknown"
 // the arguments.
 func New(msg string, args ...interface{}) error {
 	return &Error{
+		Code:    http.StatusInternalServerError,
 		Type:    TypeUnknown,
 		Message: fmt.Sprintf(msg, args...),
 		stack:   callStack(3),
@@ -29,6 +31,7 @@ func Type(err error) string {
 // Wrapf wraps the given err with formatted message and returns a new error.
 func Wrapf(err error, msg string, args ...interface{}) error {
 	return WithStack(&Error{
+		Code:     http.StatusInternalServerError,
 		Type:     TypeUnknown,
 		Message:  fmt.Sprintf(msg, args...),
 		original: err,

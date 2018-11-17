@@ -5,6 +5,14 @@ services:
     build: ./
     ports:
       - "8080:8080"
+    links:
+      - mongo
+    networks:
+      - droplet_net
+  mongo:
+    image: mongo:3-stretch
+    ports:
+      - "27017:27017"
     networks:
       - droplet_net
 

@@ -1,5 +1,7 @@
 package errors
 
+import "net/http"
+
 // Common authorization related errors
 const (
 	TypeUnauthorized = "Unauthorized"
@@ -9,6 +11,7 @@ const (
 // request.
 func Unauthorized(action string) error {
 	return WithStack(&Error{
+		Code:    http.StatusUnauthorized,
 		Type:    TypeUnauthorized,
 		Message: "You are not authorized to perform the requested action",
 		Context: map[string]interface{}{

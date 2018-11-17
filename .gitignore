@@ -22,3 +22,4 @@ PRACTICES.md
 
 # custom ignores
 cmd/expt/
+test.db
