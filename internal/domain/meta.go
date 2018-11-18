@@ -9,9 +9,6 @@ import (
 
 // Meta represents metadata about different entities.
 type Meta struct {
-	// Kind represents the type of the object.
-	Kind string `json:"kind" bson:"kind"`
-
 	// Name represents a unique name/identifier for the object.
 	Name string `json:"name" bson:"name"`
 
@@ -37,8 +34,6 @@ func (meta *Meta) SetDefaults() {
 // Validate performs basic validation of the metadata.
 func (meta Meta) Validate() error {
 	switch {
-	case empty(meta.Kind):
-		return errors.MissingField("Kind")
 	case empty(meta.Name):
 		return errors.MissingField("Name")
 	}

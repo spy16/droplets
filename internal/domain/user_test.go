@@ -24,7 +24,6 @@ func TestUser_Validate(suite *testing.T) {
 		{
 			user: domain.User{
 				Meta: domain.Meta{
-					Kind: "Author",
 					Name: "spy16",
 				},
 				Email: "blah.com",
@@ -35,7 +34,6 @@ func TestUser_Validate(suite *testing.T) {
 		{
 			user: domain.User{
 				Meta: domain.Meta{
-					Kind: "Author",
 					Name: "spy16",
 				},
 				Email: "spy16 <no-mail@nomail.com>",
