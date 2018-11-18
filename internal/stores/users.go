@@ -57,6 +57,9 @@ func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, 
 
 	user := domain.User{}
 	if err := result.Decode(&user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.ResourceNotFound("User", name)
+		}
 		return nil, err
 	}
 	user.SetDefaults()

@@ -56,6 +56,12 @@ func (err Error) Format(st fmt.State, verb rune) {
 			io.WriteString(st, err.Error())
 			err.stack.Format(st, verb)
 			return
+		} else {
+			fmt.Fprintf(st, "%s: ", err.Type)
+			for key, val := range err.Context {
+				fmt.Fprintf(st, "%s='%s' ", key, val)
+			}
+			return
 		}
 		fallthrough
 	case 's':

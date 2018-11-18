@@ -10,7 +10,7 @@ import (
 )
 
 // New initializes the server with routes exposing the given usecases.
-func New(logger logger.Logger, reg registration) *Server {
+func New(logger logger.Logger, reg registration, ret retriever) *Server {
 	srv := &Server{}
 	srv.Logger = logger
 
@@ -21,7 +21,7 @@ func New(logger logger.Logger, reg registration) *Server {
 
 	// setup api endpoints
 	router.HandleFunc("/health", srv.healthCheckHandler)
-	addUsersAPI(logger, router, reg)
+	addUsersAPI(logger, router, reg, ret)
 
 	// setup middlewares
 	srv.router = middlewares.WithRequestLogging(logger, router)

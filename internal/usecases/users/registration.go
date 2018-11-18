@@ -5,17 +5,21 @@ import (
 
 	"github.com/spy16/droplet/internal/domain"
 	"github.com/spy16/droplet/pkg/errors"
+	"github.com/spy16/droplet/pkg/logger"
 )
 
 // NewRegistration initializes a Registration service object.
-func NewRegistration(store UserStore) *Registration {
+func NewRegistration(lg logger.Logger, store UserStore) *Registration {
 	return &Registration{
-		store: store,
+		Logger: lg,
+		store:  store,
 	}
 }
 
 // Registration provides functions for user registration.
 type Registration struct {
+	logger.Logger
+
 	store UserStore
 }
 

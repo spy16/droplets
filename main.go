@@ -31,8 +31,9 @@ func main() {
 
 	lg.Debugf("setting up rest api service")
 	userStore := stores.NewUsers(client.Database("droplet"))
-	userRegistration := users.NewRegistration(userStore)
-	restHandler := rest.New(lg, userRegistration)
+	userRegistration := users.NewRegistration(lg, userStore)
+	userRetriever := users.NewRetriever(lg, userStore)
+	restHandler := rest.New(lg, userRegistration, userRetriever)
 
 	srv := graceful.NewServer(restHandler, os.Interrupt)
 	srv.Addr = ":8080"

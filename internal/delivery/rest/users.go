@@ -9,12 +9,14 @@ import (
 	"github.com/spy16/droplet/pkg/logger"
 )
 
-func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration) {
+func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration, ret retriever) {
 	uc := &userController{
 		Logger: logger,
 		reg:    reg,
+		ret:    ret,
 	}
 
+	router.HandleFunc("/v1/users/{name}", uc.get).Methods(http.MethodGet)
 	router.HandleFunc("/v1/users/", uc.post).Methods(http.MethodPost)
 }
 
@@ -22,6 +24,17 @@ type userController struct {
 	logger.Logger
 	reg registration
 	ret retriever
+}
+
+func (uc *userController) get(wr http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	user, err := uc.ret.Get(req.Context(), vars["name"])
+	if err != nil {
+		writeError(wr, err)
+		return
+	}
+
+	writeResponse(wr, http.StatusOK, user)
 }
 
 func (uc *userController) post(wr http.ResponseWriter, req *http.Request) {
@@ -48,5 +61,5 @@ type registration interface {
 }
 
 type retriever interface {
-	Get(ctx context.Context, user domain.User) (*domain.User, error)
+	Get(ctx context.Context, name string) (*domain.User, error)
 }
