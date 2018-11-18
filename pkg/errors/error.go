@@ -9,7 +9,7 @@ import (
 // context around the error.
 type Error struct {
 	// Code can represent an http error code.
-	Code int
+	Code int `json:"-"`
 
 	// Type should be an error code to identify the error. Type and Context together
 	// should provide enough context for robust error handling on client side.
@@ -63,7 +63,6 @@ func (err Error) Format(st fmt.State, verb rune) {
 			}
 			return
 		}
-		fallthrough
 	case 's':
 		io.WriteString(st, err.Error())
 	case 'q':

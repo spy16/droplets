@@ -28,10 +28,24 @@ func (reg *Registration) Register(ctx context.Context, user domain.User) (*domai
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
+	if len(user.Secret) < 8 {
+		return nil, errors.InvalidValue("Secret", "secret must have 8 or more characters")
+	}
 
 	if reg.store.Exists(ctx, user.Name) {
 		return nil, errors.Conflict("User", user.Name)
 	}
 
-	return reg.store.Save(ctx, user)
+	if err := user.HashSecret(); err != nil {
+		return nil, err
+	}
+
+	saved, err := reg.store.Save(ctx, user)
+	if err != nil {
+		reg.Logger.Warnf("failed to save user object: %v", err)
+		return nil, err
+	}
+
+	saved.Secret = ""
+	return saved, nil
 }

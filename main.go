@@ -1,16 +1,15 @@
 package main
 
 import (
-	"context"
 	"os"
 
 	"github.com/spf13/viper"
-	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/spy16/droplet/internal/delivery/rest"
 	"github.com/spy16/droplet/internal/stores"
 	"github.com/spy16/droplet/internal/usecases/users"
 	"github.com/spy16/droplet/pkg/graceful"
 	"github.com/spy16/droplet/pkg/logger"
+	"gopkg.in/mgo.v2"
 )
 
 func main() {
@@ -18,19 +17,14 @@ func main() {
 	viper.SetDefault("MONGO_URI", "mongodb://localhost")
 	lg := logger.New(os.Stderr, "debug", "text")
 
-	client, err := mongo.NewClient(viper.GetString("MONGO_URI"))
+	session, err := mgo.Dial(viper.GetString("MONGO_URI"))
 	if err != nil {
-		lg.Errorf("failed to setup MongoDB client: %s", err)
-		os.Exit(1)
+			panic(err)
 	}
-
-	if err := client.Connect(context.Background()); err != nil {
-		lg.Errorf("failed to setup MongoDB client: %s", err)
-		os.Exit(1)
-	}
+	defer session.Close()
 
 	lg.Debugf("setting up rest api service")
-	userStore := stores.NewUsers(client.Database("droplet"))
+	userStore := stores.NewUsers(session.DB("droplets"))
 	userRegistration := users.NewRegistration(lg, userStore)
 	userRetriever := users.NewRetriever(lg, userStore)
 	restHandler := rest.New(lg, userRegistration, userRetriever)

@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/spy16/droplet/pkg/errors"
-
-	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/spy16/droplet/internal/domain"
+	"github.com/spy16/droplet/pkg/errors"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // NewUsers initializes a users store with the given db handle.
-func NewUsers(db *mongo.Database) *Users {
+func NewUsers(db *mgo.Database) *Users {
 	return &Users{
 		db: db,
 	}
@@ -19,15 +19,15 @@ func NewUsers(db *mongo.Database) *Users {
 
 // Users implements UserStore interface.
 type Users struct {
-	db *mongo.Database
+	db *mgo.Database
 }
 
 // Exists checks if the user identified by the given username already
 // exists. Will return false in case of any error.
 func (users *Users) Exists(ctx context.Context, name string) bool {
-	count, err := users.db.Collection("users").Count(ctx, map[string]interface{}{
-		"name": name,
-	})
+	col := users.db.C("users")
+
+	count, err := col.Find(bson.M{"name": name}).Count()
 	if err != nil {
 		return false
 	}
@@ -42,7 +42,9 @@ func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, e
 	}
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	if _, err := users.db.Collection("users").InsertOne(ctx, user); err != nil {
+
+	col := users.db.C("users")
+	if err := col.Insert(user); err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -50,18 +52,34 @@ func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, e
 
 // FindByName finds a user by name. If not found, returns ResourceNotFound error.
 func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, error) {
-	result := users.db.Collection("users").FindOne(ctx, map[string]interface{}{"name": name})
-	if result == nil {
-		return nil, errors.ResourceNotFound("User", name)
-	}
+	col := users.db.C("users")
 
 	user := domain.User{}
-	if err := result.Decode(&user); err != nil {
-		if err == mongo.ErrNoDocuments {
+	if err := col.Find(bson.M{"name": name}).One(&user); err != nil {
+		if err == mgo.ErrNotFound {
 			return nil, errors.ResourceNotFound("User", name)
 		}
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to fetch user")
 	}
+
 	user.SetDefaults()
 	return &user, nil
+}
+
+// FindAll finds all users matching the tags.
+func (users *Users) FindAll(ctx context.Context, tags []string, limit int) ([]domain.User, error) {
+	col := users.db.C("users")
+
+	filter := bson.M{}
+	if len(tags) > 0 {
+		filter["tags"] = bson.M{
+			"$in": tags,
+		}
+	}
+
+	matches := []domain.User{}
+	if err := col.Find(filter).Limit(limit).All(&matches); err != nil {
+		return nil, errors.Wrapf(err, "failed to query for users")
+	}
+	return matches, nil
 }

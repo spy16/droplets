@@ -24,6 +24,7 @@ func New(logger logger.Logger, reg registration, ret retriever) *Server {
 	addUsersAPI(logger, router, reg, ret)
 
 	// setup middlewares
+	srv.router = router
 	srv.router = middlewares.WithRequestLogging(logger, router)
 	srv.router = middlewares.WithRecovery(logger, srv.router)
 	return srv
