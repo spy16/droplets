@@ -19,7 +19,7 @@ func main() {
 
 	session, err := mgo.Dial(viper.GetString("MONGO_URI"))
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 
@@ -38,3 +38,4 @@ func main() {
 		lg.Errorf("http server exited: %s", err)
 	}
 }
+
