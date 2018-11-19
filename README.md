@@ -12,7 +12,7 @@ Droplets is NOT built because there is no such platform nor is it built to solve
 with existing platforms.
 
 New gophers often struggle with deciding how to structure their applications and also miss certain
-important conventions (e.g., `Accept Interfaces, Return Structs`). When this leads to bad code
+important conventions (e.g., `Accept Interfaces, Return Structs`).
 
 
 Droplets is built to showcase:
