@@ -1,12 +1,12 @@
 FROM golang:1.11 as builder
-RUN mkdir /droplet-src
-WORKDIR /droplet-src
+RUN mkdir /droplets-src
+WORKDIR /droplets-src
 COPY ./ .
 RUN CGO_ENABLED=0 make setup all
 
 FROM alpine:latest
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /droplet-src/bin/droplet ./
+COPY --from=builder /droplets-src/bin/droplets ./
 EXPOSE 8080
-CMD ["./droplet"]
+CMD ["./droplets"]

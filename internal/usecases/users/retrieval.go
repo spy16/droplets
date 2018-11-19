@@ -3,8 +3,8 @@ package users
 import (
 	"context"
 
-	"github.com/spy16/droplet/internal/domain"
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/pkg/logger"
 )
 
 // NewRetriever initializes an instance of Retriever with given store.

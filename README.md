@@ -2,7 +2,7 @@
 
 # droplets
 
-[![GoDoc](https://godoc.org/github.com/spy16/droplet?status.svg)](https://godoc.org/github.com/spy16/droplet) [![Go Report Card](https://goreportcard.com/badge/github.com/spy16/droplet)](https://goreportcard.com/report/github.com/spy16/droplet)
+[![GoDoc](https://godoc.org/github.com/spy16/droplets?status.svg)](https://godoc.org/github.com/spy16/droplets) [![Go Report Card](https://goreportcard.com/badge/github.com/spy16/droplets)](https://goreportcard.com/report/github.com/spy16/droplets)
 
 A platform for Gophers similar to the awesome [Golang News](http://golangnews.com).
 
@@ -15,7 +15,7 @@ New gophers often struggle with deciding how to structure their applications and
 important conventions (e.g., `Accept Interfaces, Return Structs`). When this leads to bad code,
 they end up blaming the language.
 
-Droplet is built to showcase:
+Droplets is built to showcase:
 
 1. A manageable [Project Layout](https://github.com/golang-standards/project-layout/)
 2. Application of [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) and [EffectiveGo](https://golang.org/doc/effective_go.html)

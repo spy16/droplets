@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/pkg/logger"
 )
 
 // WithRecovery recovers from any panics and logs them appropriately.

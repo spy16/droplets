@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/spy16/droplet/internal/domain"
-	"github.com/spy16/droplet/pkg/errors"
+	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

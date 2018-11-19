@@ -3,9 +3,9 @@ package users
 import (
 	"context"
 
-	"github.com/spy16/droplet/internal/domain"
-	"github.com/spy16/droplet/pkg/errors"
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/pkg/errors"
+	"github.com/spy16/droplets/pkg/logger"
 )
 
 // NewRegistration initializes a Registration service object.

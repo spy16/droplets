@@ -4,11 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/spy16/droplet/pkg/middlewares"
-
 	"github.com/gorilla/mux"
-	"github.com/spy16/droplet/internal/domain"
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/pkg/logger"
+	"github.com/spy16/droplets/pkg/middlewares"
 )
 
 func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration, ret retriever) {

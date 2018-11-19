@@ -4,11 +4,11 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
-	"github.com/spy16/droplet/internal/delivery/rest"
-	"github.com/spy16/droplet/internal/stores"
-	"github.com/spy16/droplet/internal/usecases/users"
-	"github.com/spy16/droplet/pkg/graceful"
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/internal/delivery/rest"
+	"github.com/spy16/droplets/internal/stores"
+	"github.com/spy16/droplets/internal/usecases/users"
+	"github.com/spy16/droplets/pkg/graceful"
+	"github.com/spy16/droplets/pkg/logger"
 	"gopkg.in/mgo.v2"
 )
 

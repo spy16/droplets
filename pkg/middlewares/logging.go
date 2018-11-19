@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/spy16/droplet/pkg/logger"
+	"github.com/spy16/droplets/pkg/logger"
 )
 
 // WithRequestLogging adds logging to the given handler. Every request handled by

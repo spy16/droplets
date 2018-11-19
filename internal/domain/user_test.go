@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/spy16/droplet/internal/domain"
-	"github.com/spy16/droplet/pkg/errors"
+	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/pkg/errors"
 )
 
 func TestUser_Validate(suite *testing.T) {

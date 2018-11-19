@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/spy16/droplet/pkg/errors"
-	"github.com/spy16/droplet/pkg/logger"
-	"github.com/spy16/droplet/pkg/middlewares"
+	"github.com/spy16/droplets/pkg/errors"
+	"github.com/spy16/droplets/pkg/logger"
+	"github.com/spy16/droplets/pkg/middlewares"
 )
 
 // New initializes the server with routes exposing the given usecases.

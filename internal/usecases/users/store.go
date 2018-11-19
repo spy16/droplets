@@ -3,7 +3,7 @@ package users
 import (
 	"context"
 
-	"github.com/spy16/droplet/internal/domain"
+	"github.com/spy16/droplets/internal/domain"
 )
 
 // UserStore implementation is responsible for managing persistence of

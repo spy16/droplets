@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  droplet:
+  droplets:
     build: ./
     environment:
       - MONGO_URI=mongodb://mongo
@@ -10,13 +10,13 @@ services:
     links:
       - mongo
     networks:
-      - droplet_net
+      - droplets_net
   mongo:
     image: mongo:3-stretch
     ports:
       - "27017:27017"
     networks:
-      - droplet_net
+      - droplets_net
 
 networks:
-  droplet_net:
+  droplets_net:

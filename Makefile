@@ -1,6 +1,9 @@
 build:
-	@echo "Building droplet at './bin/droplet' ..."
-	@go build -o bin/droplet
+	@echo "Building droplets at './bin/droplets' ..."
+	@go build -o bin/droplets
+
+clean:
+	rm -rf ./bin
 
 all: lint	vet	cyclo	test	build
 

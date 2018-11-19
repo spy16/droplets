@@ -3,7 +3,7 @@ package domain
 import (
 	"net/mail"
 
-	"github.com/spy16/droplet/pkg/errors"
+	"github.com/spy16/droplets/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 

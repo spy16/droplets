@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/spy16/droplet/pkg/errors"
+	"github.com/spy16/droplets/pkg/errors"
 )
 
 func writeResponse(wr http.ResponseWriter, status int, v interface{}) {
