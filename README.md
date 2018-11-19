@@ -13,7 +13,7 @@ with existing platforms.
 
 New gophers often struggle with deciding how to structure their applications and also miss certain
 important conventions (e.g., `Accept Interfaces, Return Structs`). When this leads to bad code,
-they end up blaming the language.
+
 
 Droplets is built to showcase:
 
