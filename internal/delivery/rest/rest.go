@@ -6,52 +6,25 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spy16/droplets/pkg/errors"
 	"github.com/spy16/droplets/pkg/logger"
-	"github.com/spy16/droplets/pkg/middlewares"
 )
 
 // New initializes the server with routes exposing the given usecases.
-func New(logger logger.Logger, reg registration, ret retriever) *Server {
-	srv := &Server{}
-	srv.Logger = logger
-
+func New(logger logger.Logger, reg registration, ret retriever) http.Handler {
 	// setup router with default handlers
 	router := mux.NewRouter()
-	router.NotFoundHandler = http.HandlerFunc(srv.notFoundHandler)
-	router.MethodNotAllowedHandler = http.HandlerFunc(srv.methodNotAllowedHandler)
+	router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
+	router.MethodNotAllowedHandler = http.HandlerFunc(methodNotAllowedHandler)
 
 	// setup api endpoints
-	router.HandleFunc("/health", srv.healthCheckHandler)
 	addUsersAPI(logger, router, reg, ret)
 
-	// setup middlewares
-	srv.router = router
-	srv.router = middlewares.WithRequestLogging(logger, router)
-	srv.router = middlewares.WithRecovery(logger, srv.router)
-	return srv
+	return router
 }
 
-// Server represents a REST API server.
-type Server struct {
-	logger.Logger
-
-	router http.Handler
-}
-
-func (srv *Server) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
-	srv.router.ServeHTTP(wr, req)
-}
-
-func (srv *Server) healthCheckHandler(wr http.ResponseWriter, req *http.Request) {
-	info := map[string]interface{}{
-		"status": "ok",
-	}
-	writeResponse(wr, http.StatusOK, info)
-}
-
-func (srv *Server) notFoundHandler(wr http.ResponseWriter, req *http.Request) {
+func notFoundHandler(wr http.ResponseWriter, req *http.Request) {
 	writeResponse(wr, http.StatusNotFound, errors.ResourceNotFound("path", req.URL.Path))
 }
 
-func (srv *Server) methodNotAllowedHandler(wr http.ResponseWriter, req *http.Request) {
+func methodNotAllowedHandler(wr http.ResponseWriter, req *http.Request) {
 	writeResponse(wr, http.StatusMethodNotAllowed, errors.ResourceNotFound("path", req.URL.Path))
 }

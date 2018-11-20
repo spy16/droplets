@@ -1,14 +1,18 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 	"github.com/spy16/droplets/internal/delivery/rest"
+	"github.com/spy16/droplets/internal/delivery/web"
 	"github.com/spy16/droplets/internal/stores"
 	"github.com/spy16/droplets/internal/usecases/users"
 	"github.com/spy16/droplets/pkg/graceful"
 	"github.com/spy16/droplets/pkg/logger"
+	"github.com/spy16/droplets/pkg/middlewares"
 	"gopkg.in/mgo.v2"
 )
 
@@ -29,13 +33,31 @@ func main() {
 	userRetriever := users.NewRetriever(lg, userStore)
 	restHandler := rest.New(lg, userRegistration, userRetriever)
 
-	srv := graceful.NewServer(restHandler, os.Interrupt)
-	srv.Addr = ":8080"
-	srv.Log = lg.Errorf
+	webHandler := web.New(web.Config{})
 
-	lg.Infof("REST API server listening on :8080...")
+	router := mux.NewRouter()
+	router.PathPrefix("/api").Handler(http.StripPrefix("/api", restHandler))
+	router.PathPrefix("/").Handler(webHandler)
+
+	srv := server(lg, router)
+	lg.Infof("listening for requests on :8080...")
 	if err := srv.ListenAndServe(); err != nil {
 		lg.Errorf("http server exited: %s", err)
 	}
 }
 
+func server(lg logger.Logger, handler http.Handler) *graceful.Server {
+	handler = withMiddlewares(handler, lg)
+
+	srv := graceful.NewServer(handler, os.Interrupt)
+	srv.Addr = ":8080"
+	srv.Log = lg.Errorf
+
+	return srv
+}
+
+func withMiddlewares(handler http.Handler, logger logger.Logger) http.Handler {
+	handler = middlewares.WithRequestLogging(logger, handler)
+	handler = middlewares.WithRecovery(logger, handler)
+	return handler
+}

@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spy16/droplets/internal/domain"
 	"github.com/spy16/droplets/pkg/logger"
-	"github.com/spy16/droplets/pkg/middlewares"
 )
 
 func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration, ret retriever) {
@@ -17,12 +16,8 @@ func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration, ret
 		ret:    ret,
 	}
 
-	getWithAuth := middlewares.WithAuthentication(ret, logger, http.HandlerFunc(uc.get))
-	searchWithAuth := middlewares.WithAuthentication(ret, logger, http.HandlerFunc(uc.search))
-
-	router.Handle("/v1/users/{name}", getWithAuth).Methods(http.MethodGet)
-	router.Handle("/v1/users/", searchWithAuth).Methods(http.MethodGet)
-
+	router.HandleFunc("/v1/users/{name}", uc.get).Methods(http.MethodGet)
+	router.HandleFunc("/v1/users/", uc.search).Methods(http.MethodGet)
 	router.HandleFunc("/v1/users/", uc.post).Methods(http.MethodPost)
 }
 

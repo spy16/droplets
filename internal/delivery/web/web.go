@@ -7,14 +7,11 @@ import (
 )
 
 // New initializes a new webapp server.
-func New(cfg Config) *Server {
+func New(cfg Config) http.Handler {
 	router := mux.NewRouter()
 	router.Handle(cfg.StaticDir, newSafeFileSystemServer(cfg.StaticDir))
 
-	return &Server{
-		cfg:    cfg,
-		router: router,
-	}
+	return router
 }
 
 // Config represents server configuration.
@@ -22,14 +19,4 @@ type Config struct {
 	Addr        string
 	TemplateDir string
 	StaticDir   string
-}
-
-// Server represents an instance of webapp server.
-type Server struct {
-	cfg    Config
-	router *mux.Router
-}
-
-func (srv *Server) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
-	srv.router.ServeHTTP(wr, req)
 }

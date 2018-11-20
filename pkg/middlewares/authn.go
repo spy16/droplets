@@ -9,9 +9,9 @@ import (
 	"github.com/spy16/droplets/pkg/logger"
 )
 
-// WithAuthentication adds Basic authentication checks to the handler. Basic Auth header
+// WithBasicAuth adds Basic authentication checks to the handler. Basic Auth header
 // will be extracted from the request and verified using the verifier.
-func WithAuthentication(verifier userVerifier, lg logger.Logger, next http.Handler) http.Handler {
+func WithBasicAuth(verifier userVerifier, lg logger.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
 		name, secret, ok := req.BasicAuth()
 		if !ok {
