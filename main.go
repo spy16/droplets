@@ -18,28 +18,46 @@ import (
 
 func main() {
 	viper.AutomaticEnv()
-	viper.SetDefault("MONGO_URI", "mongodb://localhost")
-	lg := logger.New(os.Stderr, "debug", "text")
+	viper.SetDefault("MONGO_URI", "mongodb://localhost/droplets")
+	viper.SetDefault("LOG_LEVEL", "debug")
+	viper.SetDefault("LOG_FORMAT", "text")
+	viper.SetDefault("ADDR", ":8080")
+	viper.SetDefault("STATIC_DIR", "./web/static/")
+	viper.SetDefault("TEMPLATE_DIR", "./web/templates/")
 
-	session, err := mgo.Dial(viper.GetString("MONGO_URI"))
+	di, err := mgo.ParseURL(viper.GetString("MONGO_URI"))
+	if err != nil {
+		panic(err)
+	}
+	if len(di.Database) == 0 {
+		di.Database = "droplets"
+	}
+
+	lg := logger.New(os.Stderr, viper.GetString("LOG_LEVEL"), viper.GetString("LOG_FORMAT"))
+
+	session, err := mgo.DialWithInfo(di)
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
 
 	lg.Debugf("setting up rest api service")
-	userStore := stores.NewUsers(session.DB("droplets"))
+	userStore := stores.NewUsers(session.DB(di.Database))
 	userRegistration := users.NewRegistration(lg, userStore)
 	userRetriever := users.NewRetriever(lg, userStore)
 	restHandler := rest.New(lg, userRegistration, userRetriever)
 
-	webHandler := web.New(web.Config{})
+	webHandler := web.New(lg, web.Config{
+		TemplateDir: viper.GetString("TEMPLATE_DIR"),
+		StaticDir: viper.GetString("STATIC_DIR"),
+	})
 
 	router := mux.NewRouter()
 	router.PathPrefix("/api").Handler(http.StripPrefix("/api", restHandler))
 	router.PathPrefix("/").Handler(webHandler)
 
 	srv := server(lg, router)
+	srv.Addr = viper.GetString("addr")
 	lg.Infof("listening for requests on :8080...")
 	if err := srv.ListenAndServe(); err != nil {
 		lg.Errorf("http server exited: %s", err)
@@ -50,7 +68,6 @@ func server(lg logger.Logger, handler http.Handler) *graceful.Server {
 	handler = withMiddlewares(handler, lg)
 
 	srv := graceful.NewServer(handler, os.Interrupt)
-	srv.Addr = ":8080"
 	srv.Log = lg.Errorf
 
 	return srv
