@@ -47,10 +47,13 @@ func main() {
 	userRetriever := users.NewRetriever(lg, userStore)
 	restHandler := rest.New(lg, userRegistration, userRetriever)
 
-	webHandler := web.New(lg, web.Config{
+	webHandler, err := web.New(lg, web.Config{
 		TemplateDir: viper.GetString("TEMPLATE_DIR"),
 		StaticDir: viper.GetString("STATIC_DIR"),
 	})
+	if err != nil {
+		panic(err)
+	}
 
 	router := mux.NewRouter()
 	router.PathPrefix("/api").Handler(http.StripPrefix("/api", restHandler))
