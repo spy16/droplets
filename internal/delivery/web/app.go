@@ -6,9 +6,10 @@ import (
 )
 
 type app struct {
-	tpl template.Template
+	render func(wr http.ResponseWriter, tpl string, data interface{})
+	tpl    template.Template
 }
 
 func (app app) indexHandler(wr http.ResponseWriter, req *http.Request) {
-	app.tpl.ExecuteTemplate(wr, "index.html", nil)
+	app.render(wr, "index.tpl", nil)
 }

@@ -18,7 +18,11 @@ func New(lg logger.Logger, cfg Config) (http.Handler, error) {
 	}
 
 	app := &app{
-		tpl: *tpl,
+		render: func(wr http.ResponseWriter, tplName string, data interface{}) {
+			if err := tpl.ExecuteTemplate(wr, tplName, data); err != nil {
+				lg.Errorf("failed to render template '%s': %+v", tplName, err)
+			}
+		},
 	}
 
 	fsServer := newSafeFileSystemServer(lg, cfg.StaticDir)
