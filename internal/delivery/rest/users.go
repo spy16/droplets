@@ -9,7 +9,7 @@ import (
 	"github.com/spy16/droplets/pkg/logger"
 )
 
-func addUsersAPI(logger logger.Logger, router *mux.Router, reg registration, ret retriever) {
+func addUsersAPI(router *mux.Router, reg registration, ret retriever, logger logger.Logger) {
 	uc := &userController{
 		Logger: logger,
 		reg:    reg,

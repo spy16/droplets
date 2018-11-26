@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/spy16/droplets/internal/usecases/posts"
 	"net/http"
 	"os"
 
@@ -43,9 +45,16 @@ func main() {
 
 	lg.Debugf("setting up rest api service")
 	userStore := stores.NewUsers(session.DB(di.Database))
+	postStore := stores.NewPosts(session.DB(di.Database))
+
 	userRegistration := users.NewRegistration(lg, userStore)
 	userRetriever := users.NewRetriever(lg, userStore)
-	restHandler := rest.New(lg, userRegistration, userRetriever)
+
+	postPub := posts.NewPublication(lg, postStore, userStore)
+	postRet := posts.NewRetrieval(lg, postStore)
+
+	restHandler := rest.New(lg, userRegistration, userRetriever, postRet, postPub)
+	restHandler = middlewares.WithBasicAuth(middlewares.UserVerifierFunc(adminVerifier), lg, restHandler)
 
 	webHandler, err := web.New(lg, web.Config{
 		TemplateDir: viper.GetString("TEMPLATE_DIR"),
@@ -80,4 +89,8 @@ func withMiddlewares(handler http.Handler, logger logger.Logger) http.Handler {
 	handler = middlewares.WithRequestLogging(logger, handler)
 	handler = middlewares.WithRecovery(logger, handler)
 	return handler
+}
+
+func adminVerifier(ctx context.Context, name, secret string) bool {
+	return  secret == "secret@123"
 }

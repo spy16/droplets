@@ -15,7 +15,7 @@ type User struct {
 	Email string `json:"email,omitempty" bson:"email"`
 
 	// Secret represents the user secret.
-	Secret string `json:"secret,omitempty"`
+	Secret string `json:"secret,omitempty" bson:"secret"`
 }
 
 // Validate performs basic validation of user information.

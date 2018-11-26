@@ -9,14 +9,15 @@ import (
 )
 
 // New initializes the server with routes exposing the given usecases.
-func New(logger logger.Logger, reg registration, ret retriever) http.Handler {
+func New(logger logger.Logger, reg registration, ret retriever, postsRet postRetriever, postPub postPublication) http.Handler {
 	// setup router with default handlers
 	router := mux.NewRouter()
 	router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
 	router.MethodNotAllowedHandler = http.HandlerFunc(methodNotAllowedHandler)
 
 	// setup api endpoints
-	addUsersAPI(logger, router, reg, ret)
+	addUsersAPI(router, reg, ret, logger)
+	addPostsAPI(router, postPub, postsRet, logger)
 
 	return router
 }

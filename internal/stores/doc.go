@@ -3,3 +3,9 @@
 // could be moved into appropriate packages (mongo, psql etc.) based on the
 // backend they are using.
 package stores
+
+// Collection names
+const (
+	colUsers = "users"
+	colPosts = "posts"
+)

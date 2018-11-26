@@ -8,6 +8,21 @@ import (
 	"github.com/spy16/droplets/pkg/errors"
 )
 
+func TestUser_CheckSecret(t *testing.T) {
+	password := "hello@world!"
+
+	user := domain.User{}
+	user.Secret = password
+	err := user.HashSecret()
+	if err != nil {
+		t.Errorf("was not expecting error, got '%s'", err)
+	}
+
+	if !user.CheckSecret(password) {
+		t.Errorf("CheckSecret expected to return true, but got false")
+	}
+}
+
 func TestUser_Validate(suite *testing.T) {
 	suite.Parallel()
 

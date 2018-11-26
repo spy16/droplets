@@ -25,7 +25,7 @@ type Users struct {
 // Exists checks if the user identified by the given username already
 // exists. Will return false in case of any error.
 func (users *Users) Exists(ctx context.Context, name string) bool {
-	col := users.db.C("users")
+	col := users.db.C(colUsers)
 
 	count, err := col.Find(bson.M{"name": name}).Count()
 	if err != nil {
@@ -43,7 +43,7 @@ func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, e
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 
-	col := users.db.C("users")
+	col := users.db.C(colUsers)
 	if err := col.Insert(user); err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, e
 
 // FindByName finds a user by name. If not found, returns ResourceNotFound error.
 func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, error) {
-	col := users.db.C("users")
+	col := users.db.C(colUsers)
 
 	user := domain.User{}
 	if err := col.Find(bson.M{"name": name}).One(&user); err != nil {
@@ -68,7 +68,7 @@ func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, 
 
 // FindAll finds all users matching the tags.
 func (users *Users) FindAll(ctx context.Context, tags []string, limit int) ([]domain.User, error) {
-	col := users.db.C("users")
+	col := users.db.C(colUsers)
 
 	filter := bson.M{}
 	if len(tags) > 0 {
@@ -82,4 +82,25 @@ func (users *Users) FindAll(ctx context.Context, tags []string, limit int) ([]do
 		return nil, errors.Wrapf(err, "failed to query for users")
 	}
 	return matches, nil
+}
+
+// Delete removes one user identified by the name.
+func (users *Users) Delete(ctx context.Context, name string) (*domain.User, error) {
+	col := users.db.C(colUsers)
+
+	ch := mgo.Change{
+		Remove:    true,
+		ReturnNew: true,
+		Upsert:    false,
+	}
+	user := domain.User{}
+	_, err := col.Find(bson.M{"name": name}).Apply(ch, &user)
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			return nil, errors.ResourceNotFound("User", name)
+		}
+		return nil, err
+	}
+
+	return &user, nil
 }
