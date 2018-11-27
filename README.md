@@ -15,12 +15,11 @@ with existing platforms.
 New gophers often struggle with deciding how to structure their applications and also miss certain
 important conventions (e.g., `Accept Interfaces, Return Structs`).
 
-
 Droplets is built to showcase:
 
 1. A manageable [Project Layout](https://github.com/golang-standards/project-layout/)
 2. Application of [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) and [EffectiveGo](https://golang.org/doc/effective_go.html)
-3. Usage of Clean Architecture
+3. Usage of [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
 
 ## License
