@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 )
 
 // LogFunc can be set on the server to customize the message printed when the
@@ -14,7 +15,7 @@ import (
 type LogFunc func(msg string, args ...interface{})
 
 // NewServer creates a wrapper around the given handler.
-func NewServer(handler http.Handler, signals ...os.Signal) *Server {
+func NewServer(handler http.Handler, timeout time.Duration, signals ...os.Signal) *Server {
 	gss := &Server{}
 	gss.server = &http.Server{
 		Handler: handler,
@@ -32,6 +33,7 @@ type Server struct {
 
 	server  *http.Server
 	signals []os.Signal
+	timeout time.Duration
 	err     error
 }
 
@@ -88,6 +90,10 @@ func (gss *Server) waitForShutdown() error {
 	if gss.Log != nil {
 		gss.Log("received interrupt. shutting down..")
 	}
-	gss.server.Shutdown(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), gss.timeout)
+	defer cancel()
+	if err := gss.server.Shutdown(ctx); err != nil {
+		return err
+	}
 	return gss.err
 }

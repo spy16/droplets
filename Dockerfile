@@ -8,5 +8,6 @@ FROM alpine:latest
 RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /droplets-src/bin/droplets ./
+COPY --from=builder /droplets-src/web ./web
 EXPOSE 8080
 CMD ["./droplets"]

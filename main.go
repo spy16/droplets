@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/spy16/droplets/internal/usecases/posts"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/spy16/droplets/internal/usecases/posts"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
@@ -58,7 +60,7 @@ func main() {
 
 	webHandler, err := web.New(lg, web.Config{
 		TemplateDir: viper.GetString("TEMPLATE_DIR"),
-		StaticDir: viper.GetString("STATIC_DIR"),
+		StaticDir:   viper.GetString("STATIC_DIR"),
 	})
 	if err != nil {
 		panic(err)
@@ -77,9 +79,11 @@ func main() {
 }
 
 func server(lg logger.Logger, handler http.Handler) *graceful.Server {
-	handler = withMiddlewares(handler, lg)
+	viper.SetDefault("GRACEFUL_TIMEOUT", 20*time.Second)
+	timeout := viper.GetDuration("GRACEFUL_TIMEOUT")
 
-	srv := graceful.NewServer(handler, os.Interrupt)
+	handler = withMiddlewares(handler, lg)
+	srv := graceful.NewServer(handler, timeout, os.Interrupt)
 	srv.Log = lg.Errorf
 
 	return srv
@@ -92,5 +96,5 @@ func withMiddlewares(handler http.Handler, logger logger.Logger) http.Handler {
 }
 
 func adminVerifier(ctx context.Context, name, secret string) bool {
-	return  secret == "secret@123"
+	return secret == "secret@123"
 }
