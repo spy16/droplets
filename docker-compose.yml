@@ -5,6 +5,7 @@ services:
     build: ./
     environment:
       - MONGO_URI=mongodb://mongo
+      - LOG_LEVEL=info
     ports:
       - "8080:8080"
     links:
