@@ -7,7 +7,7 @@
 
 A platform for Gophers similar to the awesome [Golang News](http://golangnews.com).
 
-## Why ?
+## Why?
 
 Droplets is NOT built because there is no such platform nor is it built to solve problems
 with existing platforms.
