@@ -13,7 +13,7 @@ test:
 
 cyclo:
 	@echo "Checking cyclomatic complexity..."
-	@gocyclo -over 7 ./...
+	@gocyclo -over 7 ./
 
 vet:
 	@echo "Running vet..."

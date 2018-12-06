@@ -16,6 +16,12 @@ Droplets is built to showcase:
 3. Testing practices such as [Table-driven tests](https://github.com/golang/go/wiki/TableDrivenTests)
 
 
+## Building
+
+Droplets uses `go mod` (available from `go 1.11`) for dependency management.
+
+To test and build, run `make all`.
+
 ## Organization
 
 ### Directory Structure
