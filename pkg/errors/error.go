@@ -55,13 +55,11 @@ func (err Error) Format(st fmt.State, verb rune) {
 		if st.Flag('+') {
 			io.WriteString(st, err.Error())
 			err.stack.Format(st, verb)
-			return
 		} else {
 			fmt.Fprintf(st, "%s: ", err.Type)
 			for key, val := range err.Context {
 				fmt.Fprintf(st, "%s='%s' ", key, val)
 			}
-			return
 		}
 	case 's':
 		io.WriteString(st, err.Error())
