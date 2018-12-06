@@ -9,11 +9,11 @@ all: lint	vet	cyclo	test	build
 
 test:
 	@echo "Running unit tests..."
-	@go test -cover ./internal/... ./pkg/...
+	@go test -cover ./...
 
 cyclo:
 	@echo "Checking cyclomatic complexity..."
-	@gocyclo -over 7 ./internal ./pkg
+	@gocyclo -over 7 ./...
 
 vet:
 	@echo "Running vet..."
@@ -21,7 +21,7 @@ vet:
 
 lint:
 	@echo "Running golint..."
-	@golint ./internal/... ./pkg/...
+	@golint ./...
 
 setup:
 	@go get -u golang.org/x/lint/golint

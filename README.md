@@ -17,37 +17,53 @@ important conventions (e.g., `Accept Interfaces, Return Structs`).
 
 Droplets is built to showcase:
 
-1. A manageable [Project Layout](https://github.com/golang-standards/project-layout/)
-2. Application of [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) and [EffectiveGo](https://golang.org/doc/effective_go.html)
-3. Usage of [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+1. Application of [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) and [EffectiveGo](https://golang.org/doc/effective_go.html)
+2. Usage of [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
 
 ## Organization
 
 ### Directory Structure
 
-Directory structure is based on [Project Layout](https://github.com/golang-standards/project-layout/).
+Directory structure is based on [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
-#### 1. `internal/`
 
-- contains non-reusable parts of the project
-- directories inside `internal/` are organized as per [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-    - `domain/` contains different core entity definitions and represents the entities layer.
-    - `usecases/` contains different busniess logic built around entities and represents the usecases layer.
-    - `delivery/` exposes the usecases as API or web app and represents interface-adapter layer.
-    - `stores/` provides storage functions for domain entities and is also part of interface-adapter layer.
+#### 1. `domain/`
 
-#### 2. `pkg/`
+- represents the `entities` layer from the Clean Architecture
+- contains different core entity definitions and core validation logic
+- this package **strictly** cannot have direct dependency on external packages
 
-- contains re-usable parts of the project
-- these packages can be directly imported in other projects without being dependent on logic specific to `droplets` project.
-- some of the packages included:
-    - `logger` - provides logging functions.
-    - `graceful` - provides a server wrapper with graceful shutdown enabled.
-    - `middlewares` - provides generic middlewares for use in REST or HTTP handlers
+### 2. `usecases/`
 
-#### 3. `web/`
+- represents the `usecases` layer from the Clean Architecture
+- Usecases layer builds different business oriented usecases using the entities provided by `entities` layer
+- Any real use case would also need external entities such as persistence, external service integration etc.
+  But this layer also **strictly** cannot have direct dependency on external packages. This crossing of boundaries
+  is done through interfaces.
 
+### 3. `interfaces/`
+
+- represents the `interface-adapter` layer from the Clean Architecture
+- This is the layer that cares about the external world (i.e, external dependencies).
+- Interfacing includes:
+    - Exposing `usecases` as API (e.g., RPC, GraphQL, REST etc.)
+    - Presenting `usecases` to end-user (e.g., GUI, WebApp etc.)
+    - Persistence logic (e.g., cache, datastores etc.)
+    - Integrating an external service required by `usecases`
+- Packages inside this are organized in 2 ways:
+    1. Based on the medium they use (e.g., `rest`, `web` etc.)
+    2. Based on the external dependency they use (e.g., `mongo`, `redis` etc.)
+
+### 4. `pkg/`
+
+- contains re-usable packages that is safe to be imported in other projects
+- this package should not import anything from `domain`, `interfaces`, `usecases` or their sub-packages
+
+
+#### 5. `web/`
+
+- `web/` is **NOT** a Go package
 - contains web assets such as css, images, templates etc.
 
 ## License

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 	"github.com/spy16/droplets/pkg/logger"
 )
 
@@ -31,41 +31,41 @@ func (uc *userController) get(wr http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	user, err := uc.ret.Get(req.Context(), vars["name"])
 	if err != nil {
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
-	writeResponse(wr, http.StatusOK, user)
+	respond(wr, http.StatusOK, user)
 }
 
 func (uc *userController) search(wr http.ResponseWriter, req *http.Request) {
 	vals := req.URL.Query()["t"]
 	users, err := uc.ret.Search(req.Context(), vals, 10)
 	if err != nil {
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
-	writeResponse(wr, http.StatusOK, users)
+	respond(wr, http.StatusOK, users)
 }
 
 func (uc *userController) post(wr http.ResponseWriter, req *http.Request) {
 	user := domain.User{}
 	if err := readRequest(req, &user); err != nil {
 		uc.Warnf("failed to read user request: %s", err)
-		writeResponse(wr, http.StatusBadRequest, err)
+		respond(wr, http.StatusBadRequest, err)
 		return
 	}
 
 	registered, err := uc.reg.Register(req.Context(), user)
 	if err != nil {
 		uc.Warnf("failed to register user: %s", err)
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
 	uc.Infof("new user registered with id '%s'", registered.Name)
-	writeResponse(wr, http.StatusCreated, registered)
+	respond(wr, http.StatusCreated, registered)
 }
 
 type registration interface {

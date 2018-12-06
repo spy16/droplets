@@ -3,6 +3,8 @@ package rest
 import (
 	"net/http"
 
+	"github.com/spy16/droplets/pkg/render"
+
 	"github.com/gorilla/mux"
 	"github.com/spy16/droplets/pkg/errors"
 	"github.com/spy16/droplets/pkg/logger"
@@ -23,9 +25,11 @@ func New(logger logger.Logger, reg registration, ret retriever, postsRet postRet
 }
 
 func notFoundHandler(wr http.ResponseWriter, req *http.Request) {
-	writeResponse(wr, http.StatusNotFound, errors.ResourceNotFound("path", req.URL.Path))
+	wr.WriteHeader(http.StatusNotFound)
+	render.JSON(wr, errors.ResourceNotFound("path", req.URL.Path))
 }
 
 func methodNotAllowedHandler(wr http.ResponseWriter, req *http.Request) {
-	writeResponse(wr, http.StatusMethodNotAllowed, errors.ResourceNotFound("path", req.URL.Path))
+	wr.WriteHeader(http.StatusMethodNotAllowed)
+	render.JSON(wr, errors.ResourceNotFound("path", req.URL.Path))
 }

@@ -6,18 +6,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/spy16/droplets/internal/usecases/posts"
-
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
-	"github.com/spy16/droplets/internal/delivery/rest"
-	"github.com/spy16/droplets/internal/delivery/web"
-	"github.com/spy16/droplets/internal/stores"
-	"github.com/spy16/droplets/internal/usecases/users"
+	"github.com/spy16/droplets/interfaces/mongo"
+	"github.com/spy16/droplets/interfaces/rest"
+	"github.com/spy16/droplets/interfaces/web"
 	"github.com/spy16/droplets/pkg/graceful"
 	"github.com/spy16/droplets/pkg/logger"
 	"github.com/spy16/droplets/pkg/middlewares"
-	"gopkg.in/mgo.v2"
+	"github.com/spy16/droplets/usecases/posts"
+	"github.com/spy16/droplets/usecases/users"
 )
 
 func main() {
@@ -31,26 +29,15 @@ func main() {
 
 	lg := logger.New(os.Stderr, viper.GetString("LOG_LEVEL"), viper.GetString("LOG_FORMAT"))
 
-	di, err := mgo.ParseURL(viper.GetString("MONGO_URI"))
+	db, closeSession, err := mongo.Connect(viper.GetString("MONGO_URI"), true)
 	if err != nil {
-		lg.Fatalf("failed to parse mongo uri '%s': %v", err)
+		lg.Fatalf("failed to connect to mongodb: %v", err)
 	}
-
-	if len(di.Database) == 0 {
-		di.Database = "droplets"
-		lg.Warnf("database not specified in mongo URI, defaulting to 'droplets'")
-	}
-
-	di.FailFast = true
-	session, err := mgo.DialWithInfo(di)
-	if err != nil {
-		lg.Fatalf("failed to connect to mongo: %v", err)
-	}
-	defer session.Close()
+	defer closeSession()
 
 	lg.Debugf("setting up rest api service")
-	userStore := stores.NewUsers(session.DB(di.Database))
-	postStore := stores.NewPosts(session.DB(di.Database))
+	userStore := mongo.NewUserStore(db)
+	postStore := mongo.NewPostStore(db)
 
 	userRegistration := users.NewRegistration(lg, userStore)
 	userRetriever := users.NewRetriever(lg, userStore)

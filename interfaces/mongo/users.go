@@ -1,30 +1,32 @@
-package stores
+package mongo
 
 import (
 	"context"
 	"time"
 
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 	"github.com/spy16/droplets/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// NewUsers initializes a users store with the given db handle.
-func NewUsers(db *mgo.Database) *Users {
-	return &Users{
+const colUsers = "users"
+
+// NewUserStore initializes a users store with the given db handle.
+func NewUserStore(db *mgo.Database) *UserStore {
+	return &UserStore{
 		db: db,
 	}
 }
 
-// Users implements UserStore interface.
-type Users struct {
+// UserStore provides functions for persisting User entities in MongoDB.
+type UserStore struct {
 	db *mgo.Database
 }
 
 // Exists checks if the user identified by the given username already
 // exists. Will return false in case of any error.
-func (users *Users) Exists(ctx context.Context, name string) bool {
+func (users *UserStore) Exists(ctx context.Context, name string) bool {
 	col := users.db.C(colUsers)
 
 	count, err := col.Find(bson.M{"name": name}).Count()
@@ -35,7 +37,7 @@ func (users *Users) Exists(ctx context.Context, name string) bool {
 }
 
 // Save validates and persists the user.
-func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, error) {
+func (users *UserStore) Save(ctx context.Context, user domain.User) (*domain.User, error) {
 	user.SetDefaults()
 	if err := user.Validate(); err != nil {
 		return nil, err
@@ -51,7 +53,7 @@ func (users *Users) Save(ctx context.Context, user domain.User) (*domain.User, e
 }
 
 // FindByName finds a user by name. If not found, returns ResourceNotFound error.
-func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, error) {
+func (users *UserStore) FindByName(ctx context.Context, name string) (*domain.User, error) {
 	col := users.db.C(colUsers)
 
 	user := domain.User{}
@@ -67,7 +69,7 @@ func (users *Users) FindByName(ctx context.Context, name string) (*domain.User, 
 }
 
 // FindAll finds all users matching the tags.
-func (users *Users) FindAll(ctx context.Context, tags []string, limit int) ([]domain.User, error) {
+func (users *UserStore) FindAll(ctx context.Context, tags []string, limit int) ([]domain.User, error) {
 	col := users.db.C(colUsers)
 
 	filter := bson.M{}
@@ -85,7 +87,7 @@ func (users *Users) FindAll(ctx context.Context, tags []string, limit int) ([]do
 }
 
 // Delete removes one user identified by the name.
-func (users *Users) Delete(ctx context.Context, name string) (*domain.User, error) {
+func (users *UserStore) Delete(ctx context.Context, name string) (*domain.User, error) {
 	col := users.db.C(colUsers)
 
 	ch := mgo.Change{

@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/spy16/droplets/pkg/errors"
+	"github.com/spy16/droplets/pkg/render"
 )
 
-func writeResponse(wr http.ResponseWriter, status int, v interface{}) {
-	wr.Header().Set("Content-Type", "application/json; charset: utf-8")
+func respond(wr http.ResponseWriter, status int, v interface{}) {
 	wr.WriteHeader(status)
-	if err := json.NewEncoder(wr).Encode(v); err != nil {
+	if err := render.JSON(wr, v); err != nil {
 		if loggable, ok := wr.(errorLogger); ok {
 			loggable.Errorf("failed to write data to http ResponseWriter: %s", err)
 		}
 	}
 }
 
-func writeError(wr http.ResponseWriter, err error) {
+func respondErr(wr http.ResponseWriter, err error) {
 	if e, ok := err.(*errors.Error); ok {
-		writeResponse(wr, e.Code, e)
+		respond(wr, e.Code, e)
 		return
 	}
-	writeResponse(wr, http.StatusInternalServerError, err)
+	respond(wr, http.StatusInternalServerError, err)
 }
 
 func readRequest(req *http.Request, v interface{}) error {

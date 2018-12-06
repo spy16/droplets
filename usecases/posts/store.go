@@ -3,7 +3,7 @@ package posts
 import (
 	"context"
 
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 )
 
 // PostStore implementation is responsible for managing persistance of posts.

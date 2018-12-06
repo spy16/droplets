@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 	"github.com/spy16/droplets/pkg/logger"
 )
 

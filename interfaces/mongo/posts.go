@@ -1,29 +1,31 @@
-package stores
+package mongo
 
 import (
 	"context"
 	"time"
 
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 	"github.com/spy16/droplets/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// NewPosts initializes the Posts store with given mongo db handle.
-func NewPosts(db *mgo.Database) *Posts {
-	return &Posts{
+const colPosts = "posts"
+
+// NewPostStore initializes the Posts store with given mongo db handle.
+func NewPostStore(db *mgo.Database) *PostStore {
+	return &PostStore{
 		db: db,
 	}
 }
 
-// Posts manages persistence and retrieval of posts.
-type Posts struct {
+// PostStore manages persistence and retrieval of posts.
+type PostStore struct {
 	db *mgo.Database
 }
 
 // Exists checks if a post exists by name.
-func (posts *Posts) Exists(ctx context.Context, name string) bool {
+func (posts *PostStore) Exists(ctx context.Context, name string) bool {
 	col := posts.db.C(colPosts)
 
 	count, err := col.Find(bson.M{"name": name}).Count()
@@ -34,7 +36,7 @@ func (posts *Posts) Exists(ctx context.Context, name string) bool {
 }
 
 // Get finds a post by name.
-func (posts *Posts) Get(ctx context.Context, name string) (*domain.Post, error) {
+func (posts *PostStore) Get(ctx context.Context, name string) (*domain.Post, error) {
 	col := posts.db.C(colPosts)
 
 	post := domain.Post{}
@@ -50,7 +52,7 @@ func (posts *Posts) Get(ctx context.Context, name string) (*domain.Post, error) 
 }
 
 // Save validates and persists the post.
-func (posts *Posts) Save(ctx context.Context, post domain.Post) (*domain.Post, error) {
+func (posts *PostStore) Save(ctx context.Context, post domain.Post) (*domain.Post, error) {
 	post.SetDefaults()
 	if err := post.Validate(); err != nil {
 		return nil, err
@@ -66,7 +68,7 @@ func (posts *Posts) Save(ctx context.Context, post domain.Post) (*domain.Post, e
 }
 
 // Delete removes one post identified by the name.
-func (posts *Posts) Delete(ctx context.Context, name string) (*domain.Post, error) {
+func (posts *PostStore) Delete(ctx context.Context, name string) (*domain.Post, error) {
 	col := posts.db.C(colPosts)
 
 	ch := mgo.Change{

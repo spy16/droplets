@@ -4,12 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/spy16/droplets/pkg/middlewares"
-
 	"github.com/gorilla/mux"
-
-	"github.com/spy16/droplets/internal/domain"
+	"github.com/spy16/droplets/domain"
 	"github.com/spy16/droplets/pkg/logger"
+	"github.com/spy16/droplets/pkg/middlewares"
 )
 
 func addPostsAPI(router *mux.Router, pub postPublication, ret postRetriever, lg logger.Logger) {
@@ -34,18 +32,18 @@ func (pc *postController) get(wr http.ResponseWriter, req *http.Request) {
 	name := mux.Vars(req)["name"]
 	post, err := pc.ret.Get(req.Context(), name)
 	if err != nil {
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
-	writeResponse(wr, http.StatusOK, post)
+	respond(wr, http.StatusOK, post)
 }
 
 func (pc *postController) post(wr http.ResponseWriter, req *http.Request) {
 	post := domain.Post{}
 	if err := readRequest(req, &post); err != nil {
 		pc.Warnf("failed to read user request: %s", err)
-		writeResponse(wr, http.StatusBadRequest, err)
+		respond(wr, http.StatusBadRequest, err)
 		return
 	}
 	user, _ := middlewares.User(req)
@@ -53,22 +51,22 @@ func (pc *postController) post(wr http.ResponseWriter, req *http.Request) {
 
 	published, err := pc.pub.Publish(req.Context(), post)
 	if err != nil {
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
-	writeResponse(wr, http.StatusCreated, published)
+	respond(wr, http.StatusCreated, published)
 }
 
 func (pc *postController) delete(wr http.ResponseWriter, req *http.Request) {
 	name := mux.Vars(req)["name"]
 	post, err := pc.pub.Delete(req.Context(), name)
 	if err != nil {
-		writeError(wr, err)
+		respondErr(wr, err)
 		return
 	}
 
-	writeResponse(wr, http.StatusOK, post)
+	respond(wr, http.StatusOK, post)
 }
 
 type postRetriever interface {
