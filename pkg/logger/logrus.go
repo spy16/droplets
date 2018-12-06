@@ -28,34 +28,18 @@ func New(wr io.Writer, level string, format string) Logger {
 	lr.SetLevel(lvl)
 
 	return &logrusLogger{
-		entry: logrus.NewEntry(lr),
+		Entry: logrus.NewEntry(lr),
 	}
 }
 
 // logrusLogger provides functions for structured logging.
 type logrusLogger struct {
-	entry *logrus.Entry
-}
-
-func (ll *logrusLogger) Debugf(msg string, args ...interface{}) {
-	ll.entry.Debugf(msg, args...)
-}
-
-func (ll *logrusLogger) Infof(msg string, args ...interface{}) {
-	ll.entry.Infof(msg, args...)
-}
-
-func (ll *logrusLogger) Warnf(msg string, args ...interface{}) {
-	ll.entry.Warnf(msg, args...)
-}
-
-func (ll *logrusLogger) Errorf(msg string, args ...interface{}) {
-	ll.entry.Errorf(msg, args...)
+	*logrus.Entry
 }
 
 func (ll *logrusLogger) WithFields(fields map[string]interface{}) Logger {
-	annotatedEntry := ll.entry.WithFields(logrus.Fields(fields))
+	annotatedEntry := ll.Entry.WithFields(logrus.Fields(fields))
 	return &logrusLogger{
-		entry: annotatedEntry,
+		Entry: annotatedEntry,
 	}
 }

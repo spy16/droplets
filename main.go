@@ -29,19 +29,22 @@ func main() {
 	viper.SetDefault("STATIC_DIR", "./web/static/")
 	viper.SetDefault("TEMPLATE_DIR", "./web/templates/")
 
-	di, err := mgo.ParseURL(viper.GetString("MONGO_URI"))
-	if err != nil {
-		panic(err)
-	}
-	if len(di.Database) == 0 {
-		di.Database = "droplets"
-	}
-
 	lg := logger.New(os.Stderr, viper.GetString("LOG_LEVEL"), viper.GetString("LOG_FORMAT"))
 
+	di, err := mgo.ParseURL(viper.GetString("MONGO_URI"))
+	if err != nil {
+		lg.Fatalf("failed to parse mongo uri '%s': %v", err)
+	}
+
+	if len(di.Database) == 0 {
+		di.Database = "droplets"
+		lg.Warnf("database not specified in mongo URI, defaulting to 'droplets'")
+	}
+
+	di.FailFast = true
 	session, err := mgo.DialWithInfo(di)
 	if err != nil {
-		panic(err)
+		lg.Fatalf("failed to connect to mongo: %v", err)
 	}
 	defer session.Close()
 
@@ -63,7 +66,7 @@ func main() {
 		StaticDir:   viper.GetString("STATIC_DIR"),
 	})
 	if err != nil {
-		panic(err)
+		lg.Fatalf("failed to setup web handler: %v", err)
 	}
 
 	router := mux.NewRouter()
@@ -74,7 +77,7 @@ func main() {
 	srv.Addr = viper.GetString("addr")
 	lg.Infof("listening for requests on :8080...")
 	if err := srv.ListenAndServe(); err != nil {
-		lg.Errorf("http server exited: %s", err)
+		lg.Fatalf("http server exited: %s", err)
 	}
 }
 

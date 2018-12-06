@@ -12,6 +12,7 @@ type Logger interface {
 	Infof(msg string, args ...interface{})
 	Warnf(msg string, args ...interface{})
 	Errorf(msg string, args ...interface{})
+	Fatalf(msg string, args ...interface{})
 
 	// WithFields should return a logger which is annotated with the given
 	// fields. These fields should be added to every logging call on the
