@@ -9,16 +9,11 @@ A platform for Gophers similar to the awesome [Golang News](http://golangnews.co
 
 ## Why?
 
-Droplets is NOT built because there is no such platform nor is it built to solve problems
-with existing platforms.
-
-New gophers often struggle with deciding how to structure their applications and also miss certain
-important conventions (e.g., `Accept Interfaces, Return Structs`).
-
 Droplets is built to showcase:
 
 1. Application of [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) and [EffectiveGo](https://golang.org/doc/effective_go.html)
 2. Usage of [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+3. Testing practices such as [Table-driven tests](https://github.com/golang/go/wiki/TableDrivenTests)
 
 
 ## Organization
