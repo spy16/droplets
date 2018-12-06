@@ -8,8 +8,8 @@ import (
 	"github.com/spy16/droplets/pkg/logger"
 )
 
-// NewRetrieval initializes the retrieval usecase with given store.
-func NewRetrieval(lg logger.Logger, store Store) *Retriever {
+// NewRetriever initializes the retrieval usecase with given store.
+func NewRetriever(lg logger.Logger, store Store) *Retriever {
 	return &Retriever{
 		Logger: lg,
 		store:  store,

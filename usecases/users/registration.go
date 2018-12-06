@@ -8,23 +8,23 @@ import (
 	"github.com/spy16/droplets/pkg/logger"
 )
 
-// NewRegistration initializes a Registration service object.
-func NewRegistration(lg logger.Logger, store Store) *Registration {
-	return &Registration{
+// NewRegistrar initializes a Registration service object.
+func NewRegistrar(lg logger.Logger, store Store) *Registrar {
+	return &Registrar{
 		Logger: lg,
 		store:  store,
 	}
 }
 
-// Registration provides functions for user registration.
-type Registration struct {
+// Registrar provides functions for user registration.
+type Registrar struct {
 	logger.Logger
 
 	store Store
 }
 
 // Register creates a new user in the system using the given user object.
-func (reg *Registration) Register(ctx context.Context, user domain.User) (*domain.User, error) {
+func (reg *Registrar) Register(ctx context.Context, user domain.User) (*domain.User, error) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}

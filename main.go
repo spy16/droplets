@@ -39,11 +39,11 @@ func main() {
 	userStore := mongo.NewUserStore(db)
 	postStore := mongo.NewPostStore(db)
 
-	userRegistration := users.NewRegistration(lg, userStore)
+	userRegistration := users.NewRegistrar(lg, userStore)
 	userRetriever := users.NewRetriever(lg, userStore)
 
 	postPub := posts.NewPublication(lg, postStore, userStore)
-	postRet := posts.NewRetrieval(lg, postStore)
+	postRet := posts.NewRetriever(lg, postStore)
 
 	restHandler := rest.New(lg, userRegistration, userRetriever, postRet, postPub)
 	restHandler = middlewares.WithBasicAuth(middlewares.UserVerifierFunc(adminVerifier), lg, restHandler)
