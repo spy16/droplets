@@ -8,7 +8,7 @@ import (
 )
 
 // NewRetriever initializes an instance of Retriever with given store.
-func NewRetriever(lg logger.Logger, store UserStore) *Retriever {
+func NewRetriever(lg logger.Logger, store Store) *Retriever {
 	return &Retriever{
 		Logger: lg,
 		store:  store,
@@ -19,7 +19,7 @@ func NewRetriever(lg logger.Logger, store UserStore) *Retriever {
 type Retriever struct {
 	logger.Logger
 
-	store UserStore
+	store Store
 }
 
 // Search finds all users matching the tags.

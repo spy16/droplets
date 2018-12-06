@@ -6,9 +6,9 @@ import (
 	"github.com/spy16/droplets/domain"
 )
 
-// UserStore implementation is responsible for managing persistence of
+// Store implementation is responsible for managing persistence of
 // users.
-type UserStore interface {
+type Store interface {
 	Exists(ctx context.Context, name string) bool
 	Save(ctx context.Context, user domain.User) (*domain.User, error)
 	FindByName(ctx context.Context, name string) (*domain.User, error)

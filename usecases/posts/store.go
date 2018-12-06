@@ -6,8 +6,8 @@ import (
 	"github.com/spy16/droplets/domain"
 )
 
-// PostStore implementation is responsible for managing persistance of posts.
-type PostStore interface {
+// Store implementation is responsible for managing persistance of posts.
+type Store interface {
 	Get(ctx context.Context, name string) (*domain.Post, error)
 	Exists(ctx context.Context, name string) bool
 	Save(ctx context.Context, post domain.Post) (*domain.Post, error)

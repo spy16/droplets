@@ -9,7 +9,7 @@ import (
 )
 
 // NewRetrieval initializes the retrieval usecase with given store.
-func NewRetrieval(lg logger.Logger, store PostStore) *Retriever {
+func NewRetrieval(lg logger.Logger, store Store) *Retriever {
 	return &Retriever{
 		Logger: lg,
 		store:  store,
@@ -20,7 +20,7 @@ func NewRetrieval(lg logger.Logger, store PostStore) *Retriever {
 type Retriever struct {
 	logger.Logger
 
-	store PostStore
+	store Store
 }
 
 // Get finds a post by its name.

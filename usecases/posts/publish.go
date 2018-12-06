@@ -10,7 +10,7 @@ import (
 )
 
 // NewPublication initializes the publication usecase.
-func NewPublication(lg logger.Logger, store PostStore, verifier userVerifier) *Publication {
+func NewPublication(lg logger.Logger, store Store, verifier userVerifier) *Publication {
 	return &Publication{
 		Logger:   lg,
 		store:    store,
@@ -22,7 +22,7 @@ func NewPublication(lg logger.Logger, store PostStore, verifier userVerifier) *P
 type Publication struct {
 	logger.Logger
 
-	store    PostStore
+	store    Store
 	verifier userVerifier
 }
 

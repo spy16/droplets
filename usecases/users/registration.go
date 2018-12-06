@@ -9,7 +9,7 @@ import (
 )
 
 // NewRegistration initializes a Registration service object.
-func NewRegistration(lg logger.Logger, store UserStore) *Registration {
+func NewRegistration(lg logger.Logger, store Store) *Registration {
 	return &Registration{
 		Logger: lg,
 		store:  store,
@@ -20,7 +20,7 @@ func NewRegistration(lg logger.Logger, store UserStore) *Registration {
 type Registration struct {
 	logger.Logger
 
-	store UserStore
+	store Store
 }
 
 // Register creates a new user in the system using the given user object.
