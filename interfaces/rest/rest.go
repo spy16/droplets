@@ -25,11 +25,9 @@ func New(logger logger.Logger, reg registration, ret retriever, postsRet postRet
 }
 
 func notFoundHandler(wr http.ResponseWriter, req *http.Request) {
-	wr.WriteHeader(http.StatusNotFound)
-	render.JSON(wr, errors.ResourceNotFound("path", req.URL.Path))
+	render.JSON(wr, http.StatusNotFound, errors.ResourceNotFound("path", req.URL.Path))
 }
 
 func methodNotAllowedHandler(wr http.ResponseWriter, req *http.Request) {
-	wr.WriteHeader(http.StatusMethodNotAllowed)
-	render.JSON(wr, errors.ResourceNotFound("path", req.URL.Path))
+	render.JSON(wr, http.StatusMethodNotAllowed, errors.ResourceNotFound("path", req.URL.Path))
 }

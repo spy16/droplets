@@ -2,11 +2,11 @@ package middlewares
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/spy16/droplets/pkg/errors"
 	"github.com/spy16/droplets/pkg/logger"
+	"github.com/spy16/droplets/pkg/render"
 )
 
 var authUser = ctxKey("user")
@@ -17,15 +17,14 @@ func WithBasicAuth(verifier UserVerifier, lg logger.Logger, next http.Handler) h
 	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
 		name, secret, ok := req.BasicAuth()
 		if !ok {
-			json.NewEncoder(wr).Encode(errors.Unauthorized("Basic auth header is not present"))
-			wr.WriteHeader(http.StatusUnauthorized)
+			render.JSON(wr, http.StatusUnauthorized, errors.Unauthorized("Basic auth header is not present"))
 			return
 		}
 
 		verified := verifier.VerifySecret(req.Context(), name, secret)
 		if !verified {
-			json.NewEncoder(wr).Encode(errors.Unauthorized("Invalid username or secret"))
 			wr.WriteHeader(http.StatusUnauthorized)
+			render.JSON(wr, http.StatusUnauthorized, errors.Unauthorized("Invalid username or secret"))
 			return
 		}
 

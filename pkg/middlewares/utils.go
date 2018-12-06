@@ -15,6 +15,14 @@ func requestInfo(req *http.Request) map[string]interface{} {
 	}
 }
 
+func wrap(wr http.ResponseWriter, logger logger.Logger) *wrappedWriter {
+	return &wrappedWriter{
+		ResponseWriter: wr,
+		Logger:         logger,
+		wroteStatus:    http.StatusOK,
+	}
+}
+
 type wrappedWriter struct {
 	http.ResponseWriter
 	logger.Logger

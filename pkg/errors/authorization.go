@@ -9,13 +9,13 @@ const (
 
 // Unauthorized can be used to generate an error that represents an unauthorized
 // request.
-func Unauthorized(action string) error {
+func Unauthorized(reason string) error {
 	return WithStack(&Error{
 		Code:    http.StatusUnauthorized,
 		Type:    TypeUnauthorized,
 		Message: "You are not authorized to perform the requested action",
 		Context: map[string]interface{}{
-			"action": action,
+			"reason": reason,
 		},
 	})
 }

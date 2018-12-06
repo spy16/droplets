@@ -14,24 +14,26 @@ import (
 // handlers to perform additional logging.
 func WithRequestLogging(logger logger.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
-		wrappedWr := &wrappedWriter{
-			ResponseWriter: wr,
-			Logger:         logger,
-			wroteStatus:    http.StatusOK,
-		}
+		wrappedWr := wrap(wr, logger)
 
 		start := time.Now()
+		defer logRequest(logger, start, wrappedWr, req)
+
 		next.ServeHTTP(wrappedWr, req)
-		duration := time.Now().Sub(start)
 
-		info := map[string]interface{}{
-			"latency": duration,
-			"status":  wrappedWr.wroteStatus,
-		}
-
-		logger.
-			WithFields(requestInfo(req)).
-			WithFields(info).
-			Infof("request completed with code %d", wrappedWr.wroteStatus)
 	})
+}
+
+func logRequest(logger logger.Logger, startedAt time.Time, wr *wrappedWriter, req *http.Request) {
+	duration := time.Now().Sub(startedAt)
+
+	info := map[string]interface{}{
+		"latency": duration,
+		"status":  wr.wroteStatus,
+	}
+
+	logger.
+		WithFields(requestInfo(req)).
+		WithFields(info).
+		Infof("request completed with code %d", wr.wroteStatus)
 }

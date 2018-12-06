@@ -9,8 +9,7 @@ import (
 )
 
 func respond(wr http.ResponseWriter, status int, v interface{}) {
-	wr.WriteHeader(status)
-	if err := render.JSON(wr, v); err != nil {
+	if err := render.JSON(wr, status, v); err != nil {
 		if loggable, ok := wr.(errorLogger); ok {
 			loggable.Errorf("failed to write data to http ResponseWriter: %s", err)
 		}
