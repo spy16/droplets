@@ -29,7 +29,7 @@ Directory structure is based on [Clean Architecture](http://blog.cleancoder.com/
 - contains different core entity definitions and core validation logic
 - this package **strictly** cannot have direct dependency on external packages
 
-### 2. `usecases/`
+#### 2. `usecases/`
 
 - represents the `usecases` layer from the Clean Architecture
 - Usecases layer builds different business oriented usecases using the entities provided by `entities` layer
@@ -37,7 +37,7 @@ Directory structure is based on [Clean Architecture](http://blog.cleancoder.com/
   But this layer also **strictly** cannot have direct dependency on external packages. This crossing of boundaries
   is done through interfaces.
 
-### 3. `interfaces/`
+#### 3. `interfaces/`
 
 - represents the `interface-adapter` layer from the Clean Architecture
 - This is the layer that cares about the external world (i.e, external dependencies).
@@ -50,7 +50,7 @@ Directory structure is based on [Clean Architecture](http://blog.cleancoder.com/
     1. Based on the medium they use (e.g., `rest`, `web` etc.)
     2. Based on the external dependency they use (e.g., `mongo`, `redis` etc.)
 
-### 4. `pkg/`
+#### 4. `pkg/`
 
 - contains re-usable packages that is safe to be imported in other projects
 - this package should not import anything from `domain`, `interfaces`, `usecases` or their sub-packages
