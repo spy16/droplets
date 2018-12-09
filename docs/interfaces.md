@@ -47,7 +47,12 @@ like `Java`, `C#` etc. This simply means that a type `MyType` does not need to a
 to be compatible with an interface `Doer`. `MyType` is compatible with `Doer` interface if it has all the
 methods defined in `Doer`.
 
-This provides an interesting power to Go interfaces. Clients are truly free to define interfaces when they
+Read following articles for more information:
+
+1. https://medium.com/@cep21/preemptive-interface-anti-pattern-in-go-54c18ac0668a
+2. https://medium.com/@cep21/what-accept-interfaces-return-structs-means-in-go-2fe879e25ee8
+
+This also provides an interesting power to Go interfaces. Clients are truly free to define interfaces when they
 need to. For example consider the following function:
 
 ```go
@@ -93,5 +98,3 @@ more than it needs.
 
 Refer following articles for more information:
 
-1. https://medium.com/@cep21/preemptive-interface-anti-pattern-in-go-54c18ac0668a
-2. https://medium.com/@cep21/what-accept-interfaces-return-structs-means-in-go-2fe879e25ee8
