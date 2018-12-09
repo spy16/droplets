@@ -19,17 +19,10 @@ import (
 )
 
 func main() {
-	viper.AutomaticEnv()
-	viper.SetDefault("MONGO_URI", "mongodb://localhost/droplets")
-	viper.SetDefault("LOG_LEVEL", "debug")
-	viper.SetDefault("LOG_FORMAT", "text")
-	viper.SetDefault("ADDR", ":8080")
-	viper.SetDefault("STATIC_DIR", "./web/static/")
-	viper.SetDefault("TEMPLATE_DIR", "./web/templates/")
+	cfg := loadConfig()
+	lg := logger.New(os.Stderr, cfg.LogLevel, cfg.LogFormat)
 
-	lg := logger.New(os.Stderr, viper.GetString("LOG_LEVEL"), viper.GetString("LOG_FORMAT"))
-
-	db, closeSession, err := mongo.Connect(viper.GetString("MONGO_URI"), true)
+	db, closeSession, err := mongo.Connect(cfg.MongoURI, true)
 	if err != nil {
 		lg.Fatalf("failed to connect to mongodb: %v", err)
 	}
@@ -46,45 +39,73 @@ func main() {
 	postRet := posts.NewRetriever(lg, postStore)
 
 	restHandler := rest.New(lg, userRegistration, userRetriever, postRet, postPub)
-	restHandler = middlewares.WithBasicAuth(middlewares.UserVerifierFunc(adminVerifier), lg, restHandler)
-
 	webHandler, err := web.New(lg, web.Config{
-		TemplateDir: viper.GetString("TEMPLATE_DIR"),
-		StaticDir:   viper.GetString("STATIC_DIR"),
+		TemplateDir: cfg.TemplateDir,
+		StaticDir:   cfg.StaticDir,
 	})
 	if err != nil {
 		lg.Fatalf("failed to setup web handler: %v", err)
 	}
 
-	router := mux.NewRouter()
-	router.PathPrefix("/api").Handler(http.StripPrefix("/api", restHandler))
-	router.PathPrefix("/").Handler(webHandler)
-
-	srv := server(lg, router)
-	srv.Addr = viper.GetString("addr")
+	srv := setupServer(cfg, lg, webHandler, restHandler)
 	lg.Infof("listening for requests on :8080...")
 	if err := srv.ListenAndServe(); err != nil {
 		lg.Fatalf("http server exited: %s", err)
 	}
 }
 
-func server(lg logger.Logger, handler http.Handler) *graceful.Server {
-	viper.SetDefault("GRACEFUL_TIMEOUT", 20*time.Second)
-	timeout := viper.GetDuration("GRACEFUL_TIMEOUT")
+func setupServer(cfg config, lg logger.Logger, web http.Handler, rest http.Handler) *graceful.Server {
+	rest = middlewares.WithBasicAuth(lg, rest,
+		middlewares.UserVerifierFunc(func(ctx context.Context, name, secret string) bool {
+			return secret == "secret@123"
+		}),
+	)
 
-	handler = withMiddlewares(handler, lg)
-	srv := graceful.NewServer(handler, timeout, os.Interrupt)
+	router := mux.NewRouter()
+	router.PathPrefix("/api").Handler(http.StripPrefix("/api", rest))
+	router.PathPrefix("/").Handler(web)
+
+	handler := middlewares.WithRequestLogging(lg, router)
+	handler = middlewares.WithRecovery(lg, handler)
+
+	srv := graceful.NewServer(handler, cfg.GracefulTimeout, os.Interrupt)
 	srv.Log = lg.Errorf
-
+	srv.Addr = cfg.Addr
 	return srv
 }
 
-func withMiddlewares(handler http.Handler, logger logger.Logger) http.Handler {
-	handler = middlewares.WithRequestLogging(logger, handler)
-	handler = middlewares.WithRecovery(logger, handler)
-	return handler
+type config struct {
+	Addr            string
+	LogLevel        string
+	LogFormat       string
+	StaticDir       string
+	TemplateDir     string
+	GracefulTimeout time.Duration
+	MongoURI        string
 }
 
-func adminVerifier(ctx context.Context, name, secret string) bool {
-	return secret == "secret@123"
+func loadConfig() config {
+	viper.SetDefault("MONGO_URI", "mongodb://localhost/droplets")
+	viper.SetDefault("LOG_LEVEL", "debug")
+	viper.SetDefault("LOG_FORMAT", "text")
+	viper.SetDefault("ADDR", ":8080")
+	viper.SetDefault("STATIC_DIR", "./web/static/")
+	viper.SetDefault("TEMPLATE_DIR", "./web/templates/")
+	viper.SetDefault("GRACEFUL_TIMEOUT", 20*time.Second)
+
+	viper.ReadInConfig()
+	viper.AutomaticEnv()
+
+	return config{
+		// application configuration
+		Addr:            viper.GetString("ADDR"),
+		StaticDir:       viper.GetString("STATIC_DIR"),
+		TemplateDir:     viper.GetString("TEMPLATE_DIR"),
+		LogLevel:        viper.GetString("LOG_LEVEL"),
+		LogFormat:       viper.GetString("LOG_FORMAT"),
+		GracefulTimeout: viper.GetDuration("GRACEFUL_TIMEOUT"),
+
+		// store configuration
+		MongoURI: viper.GetString("MONGO_URI"),
+	}
 }
