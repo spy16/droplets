@@ -51,6 +51,8 @@ See [Interfaces](interfaces.md) for conventions around interfaces.
 
 ### 3. `interfaces/`
 
+> Should not be confused with Go `interface` keyword.
+
 - Represents the `interface-adapter` layer from the Clean Architecture
 - This is the layer that cares about the external world (i.e, external dependencies).
 - Interfacing includes:

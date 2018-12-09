@@ -1,5 +1,12 @@
 # Interfaces
 
+Following are some best practices for using interfaces:
+
+1. Define small interfaces with well defined scope
+   - Single-method interfaces are ideal (e.g. `io.Reader`, `io.Writer` etc.)
+   - [Bigger the interface, weaker the abstraction - Go Proverbs by Rob Pike](https://www.youtube.com/watch?v=PAAkCSZUG1c&t=5m17s)
+2. Accept interfaces, return structs [More](#where-should-i-define-the-interface-)
+
 ## Where should I define the interface ?
 
 From [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments#interfaces):
@@ -38,6 +45,50 @@ Go uses [Structural Type System](https://en.wikipedia.org/wiki/Structural_type_s
 like `Java`, `C#` etc. This simply means that a type `MyType` does not need to add `implements Doer` clause
 to be compatible with an interface `Doer`. `MyType` is compatible with `Doer` interface if it has all the
 methods defined in `Doer`.
+
+This provides an interesting power to Go interfaces. Clients are truly free to define interfaces when they
+need to. For example consider the following function:
+
+```go
+func writeData(f *os.File, data string) {
+    f.Write([]byte(data))
+}
+```
+
+Let's assume after sometime a new feature requirement which requires us to write to a tcp connection. One
+thing we could do is define a new function:
+
+```go
+func writeDataToTCPCon(con *net.TCPConn, data string) {
+    f.Write([]byte(data))
+}
+```
+
+But this would get pretty messed up as we get more and more places to write. But instead, you can simply
+refactor the `writeData` function as below:
+
+```go
+type writer interface {
+    Write([]byte) (int, error)
+}
+s
+func writeData(wr io.Writer, data string) {
+    f.Write([]byte(data))
+}
+```
+
+Refactored `writeData` will continue to work with our existing code that is passing `*os.File` since it
+implements `writer`. In addition, `writeData` function can now accept anything that implements `writer`
+which includes `os.File`, `net.TCPConn`, `http.ResponseWriter` etc. (And every single Go entity in the
+**entire world** that has a method `Write([]byte) (int, error)`)
+
+Note that, this pattern is *not possible in other languages*. Because, after refactoring `writeData` to
+accept a new interface `writer`, you need to refactor all the classes you want to use with `writeData` to
+have `implements writer` in its declaration.
+
+Another advantage is that client is free to define the subset of features it requires instead of accepting
+more than it needs.
+
 
 Refer following articles for more information:
 
