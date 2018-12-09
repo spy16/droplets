@@ -96,5 +96,3 @@ Another advantage is that client is free to define the subset of features it req
 more than it needs.
 
 
-Refer following articles for more information:
-
