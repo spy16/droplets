@@ -15,6 +15,9 @@ Droplets is built to showcase:
 2. Usage of [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 3. Testing practices such as [Table-driven tests](https://github.com/golang/go/wiki/TableDrivenTests)
 
+Follow the links to understand best practices and conventions used:
+1. [Directory Structure](./docs/organization.md)
+2. [Interfaces](./docs/interfaces.md)
 
 ## Building
 
@@ -22,10 +25,5 @@ Droplets uses `go mod` (available from `go 1.11`) for dependency management.
 
 To test and build, run `make all`.
 
-## Practices and Conventions Used
-
-1. [Directory Structure](./docs/organization.md)
-2. [Interfaces](./docs/interfaces.md)
-
-### Directory Structur## License
+## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fspy16%2Fdroplets.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fspy16%2Fdroplets?ref=badge_large)
