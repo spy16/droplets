@@ -1,6 +1,5 @@
-# Practices and Conventions
 
-## 1. Directory Structure
+# Directory Structure
 
 Directory structure is based on [Clean Architecture](http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
