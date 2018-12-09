@@ -5,7 +5,8 @@ Following are some best practices for using interfaces:
 1. Define small interfaces with well defined scope
    - Single-method interfaces are ideal (e.g. `io.Reader`, `io.Writer` etc.)
    - [Bigger the interface, weaker the abstraction - Go Proverbs by Rob Pike](https://www.youtube.com/watch?v=PAAkCSZUG1c&t=5m17s)
-2. Accept interfaces, return structs [More](#where-should-i-define-the-interface-)
+2. Accept interfaces, return structs
+   - Interfaces should be defined where they are used [Read More](#where-should-i-define-the-interface-)
 
 ## Where should I define the interface ?
 
