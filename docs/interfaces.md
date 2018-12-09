@@ -70,15 +70,16 @@ func writeDataToTCPCon(con *net.TCPConn, data string) {
 }
 ```
 
-But this would get pretty messed up as we get more and more places to write. But instead, you can simply
-refactor the `writeData` function as below:
+But this approach is tedious and will grow out of control quickly as new requirements are added. Alos, different
+writers cannot be injected into other entities easily. But instead, you can simply refactor the `writeData` function
+as below:
 
 ```go
 type writer interface {
     Write([]byte) (int, error)
 }
-s
-func writeData(wr io.Writer, data string) {
+
+func writeData(wr writer, data string) {
     f.Write([]byte(data))
 }
 ```
@@ -90,7 +91,7 @@ which includes `os.File`, `net.TCPConn`, `http.ResponseWriter` etc. (And every s
 
 Note that, this pattern is *not possible in other languages*. Because, after refactoring `writeData` to
 accept a new interface `writer`, you need to refactor all the classes you want to use with `writeData` to
-have `implements writer` in its declaration.
+have `implements writer` in their declarations.
 
 Another advantage is that client is free to define the subset of features it requires instead of accepting
 more than it needs.
