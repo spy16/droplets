@@ -1,3 +1,4 @@
+
 # Interfaces
 
 Following are some best practices for using interfaces:
@@ -70,7 +71,7 @@ func writeDataToTCPCon(con *net.TCPConn, data string) {
 }
 ```
 
-But this approach is tedious and will grow out of control quickly as new requirements are added. Alos, different
+But this approach is tedious and will grow out of control quickly as new requirements are added. Also, different
 writers cannot be injected into other entities easily. But instead, you can simply refactor the `writeData` function
 as below:
 
