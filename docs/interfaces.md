@@ -67,7 +67,7 @@ thing we could do is define a new function:
 
 ```go
 func writeDataToTCPCon(con *net.TCPConn, data string) {
-    f.Write([]byte(data))
+    con.Write([]byte(data))
 }
 ```
 
@@ -81,7 +81,7 @@ type writer interface {
 }
 
 func writeData(wr writer, data string) {
-    f.Write([]byte(data))
+    wr.Write([]byte(data))
 }
 ```
 
