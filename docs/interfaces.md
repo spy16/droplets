@@ -18,7 +18,7 @@ From [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments#i
 
 Interfaces are contracts that should be used to define the minimal requirement of a client
 to execute its functionality. In other words, client defines what it needs and not the
-implementor. So, interfaces should always be defined on the client side. This is also inline
+implementor. So, interfaces should generally be defined on the client side. This is also inline
 with the [Interface Segregation Principle](https://en.wikipedia.org/wiki/Interface_segregation_principle)
 from [SOLID](https://en.wikipedia.org/wiki/SOLID) principles.
 
