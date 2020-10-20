@@ -17,11 +17,10 @@ type LogFunc func(msg string, args ...interface{})
 // NewServer creates a wrapper around the given handler.
 func NewServer(handler http.Handler, timeout time.Duration, signals ...os.Signal) *Server {
 	gss := &Server{}
-	gss.server = &http.Server{
-		Handler: handler,
-	}
+	gss.server = &http.Server{Handler: handler}
 	gss.signals = signals
 	gss.Log = log.Printf
+	gss.timeout = timeout
 	return gss
 }
 
@@ -31,69 +30,85 @@ type Server struct {
 	Addr string
 	Log  LogFunc
 
-	server  *http.Server
-	signals []os.Signal
-	timeout time.Duration
-	err     error
+	server   *http.Server
+	signals  []os.Signal
+	timeout  time.Duration
+	startErr error
 }
 
 // Serve starts the http listener with the registered http.Handler and
 // then blocks until a interrupt signal is received.
 func (gss *Server) Serve(l net.Listener) error {
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		if err := gss.server.Serve(l); err != nil {
-			gss.err = err
+			gss.startErr = err
+			cancel()
 		}
 	}()
-	return gss.waitForShutdown()
+	return gss.waitForInterrupt(ctx)
 }
 
 // ServeTLS starts the http listener with the registered http.Handler and
 // then blocks until a interrupt signal is received.
 func (gss *Server) ServeTLS(l net.Listener, certFile, keyFile string) error {
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		if err := gss.server.ServeTLS(l, certFile, keyFile); err != nil {
-			gss.err = err
+			gss.startErr = err
+			cancel()
 		}
 	}()
-	return gss.waitForShutdown()
+	return gss.waitForInterrupt(ctx)
 }
 
 // ListenAndServe serves the requests on a listener bound to interface
 // specified by Addr
 func (gss *Server) ListenAndServe() error {
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		gss.server.Addr = gss.Addr
 		if err := gss.server.ListenAndServe(); err != http.ErrServerClosed {
-			gss.err = err
+			gss.startErr = err
+			cancel()
 		}
 	}()
-	return gss.waitForShutdown()
+	return gss.waitForInterrupt(ctx)
 }
 
 // ListenAndServeTLS serves the requests on a listener bound to interface
 // specified by Addr
 func (gss *Server) ListenAndServeTLS(certFile, keyFile string) error {
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		if err := gss.server.ListenAndServeTLS(certFile, keyFile); err != http.ErrServerClosed {
-			gss.err = err
+			gss.startErr = err
+			cancel()
 		}
 	}()
-	return gss.waitForShutdown()
+	return gss.waitForInterrupt(ctx)
 }
 
-func (gss *Server) waitForShutdown() error {
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, gss.signals...)
-	_ = <-sig
+func (gss *Server) waitForInterrupt(ctx context.Context) error {
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, gss.signals...)
 
-	if gss.Log != nil {
-		gss.Log("received interrupt. shutting down..")
+	select {
+	case sig := <-sigCh:
+		if gss.Log != nil {
+			gss.Log("shutting down (signal=%s)...", sig)
+		}
+		break
+
+	case <-ctx.Done():
+		return gss.startErr
 	}
+
+	return gss.shutdown()
+}
+
+func (gss *Server) shutdown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), gss.timeout)
 	defer cancel()
-	if err := gss.server.Shutdown(ctx); err != nil {
-		return err
-	}
-	return gss.err
+	return gss.server.Shutdown(ctx)
 }
