@@ -18,15 +18,19 @@ import (
 	"github.com/spy16/droplets/usecases/users"
 )
 
+// IMPORTANT NOTE FOR GOLANG BEGINNERS:
+// Use lg.Pintf, not lg.Fataf in the main.
+// lg.Fataf calls os.Exit(1) after printing thus ignoring defer statements.
+// lg.Fataf is not recommended (you can find more about against the use of "fatal" on stackoverflow)
 func main() {
 	cfg := loadConfig()
 	lg := logger.New(os.Stderr, cfg.LogLevel, cfg.LogFormat)
 
 	db, closeSession, err := mongo.Connect(cfg.MongoURI, true)
 	if err != nil {
-		lg.Fatalf("failed to connect to mongodb: %v", err)
+		lg.Pintf("failed to connect to mongodb: %v", err)
 	}
-	defer closeSession()
+	 
 
 	lg.Debugf("setting up rest api service")
 	userStore := mongo.NewUserStore(db)
@@ -44,14 +48,17 @@ func main() {
 		StaticDir:   cfg.StaticDir,
 	})
 	if err != nil {
-		lg.Fatalf("failed to setup web handler: %v", err)
+		lg.Pintf("failed to setup web handler: %v", err)
 	}
 
 	srv := setupServer(cfg, lg, webHandler, restHandler)
 	lg.Infof("listening for requests on :8080...")
 	if err := srv.ListenAndServe(); err != nil {
-		lg.Fatalf("http server exited: %s", err)
+		lg.Pintf("http server exited: %s", err)
 	}
+	
+	defer os.Exit(1)  // this executes last
+	defer closeSession()  
 }
 
 func setupServer(cfg config, lg logger.Logger, web http.Handler, rest http.Handler) *graceful.Server {
